@@ -70,14 +70,19 @@ const UpdateEmployeeRoleQuestions = [
     },
 ]
 
-function viewAllDepartments(){
-    db.promise().query("SELECT * from departments ")
-    .then(function(departmentData){
-        console.log(departmentData);
-        console.table(departmentData[0])
-    })
-    //Use the database to retrieve data
+//
+function addDepartments()
+{
+    inquirer
+    .prompt(NewDepartment)
+    .then ((response)=> {
+        db.addDepartment(response).then((results) => {
+        console.log('\n', results, '\n');
+        })
+
+    });
 }
+
 
 function viewAllRoles(){
     db.promise().query("SELECT * from roles ")
@@ -97,38 +102,56 @@ function viewAllEmployees(){
     //Use the database to retrieve data
 }
 
-function addDepartments(){
-    db.promise().query("SELECT * from add_departments")
-    .then(function(addedDepartmentsData){
-        console.log(addedDepartmentsData);
-        console.table(addedDepartmentsData[0])
-    })
-    //Use the database to retrieve data
-}
+
+//add newdepartmenst questions and call back to main questions
+function viewAllDepartments() {
+        db.promise().query("SELECT * from add deperatments")
+    db.getDepartments().then((results) => {
+        const NewDepartment = AddRoleQuestions[2];
+        results.forEach((department) => {
+            NewDepartment.choices.push({
+                value:department.id,
+                name:department.name
+            });
+        })
+    });
+    }
+    
 
 function addRoles(){
-    db.promise().query("SELECT * from add_roles")
-    .then(function(addedRolesData){
-        console.log(addedRolesData);
-        console.table(addedRolesData[0])
+
+    inquirer
+    .prompt(UpdateEmployeeRoleQuestions)
+    .then((response) => {
+        db.addRoles(response).then((results) => {
+            console.log ('\n', results, '\n');
+            MainMenuQuestions();
+        });
     })
-    //Use the database to retrieve data
 }
 
+
+
 function addEmployees(){
-    db.promise().query("SELECT * from add_employees")
-    .then(function(addedEmployeesData){
-        console.log(addedEmployeesData);
-        console.table(addedEmployeesData[0])
+    inquirer
+    .prompt(EmployeeQuestions)
+    .then((response) => {
+        db.addEmployees(response).then((results) => {
+            console.log ('\n', results, '\n');
+            MainMenuQuestions();
+        });
     })
-    //Use the database to retrieve data
 }
 
 function UpdateRole(){
-    db.promise().query("SELECT * from update_role")
-    .then(function(UpdatedRoleData){
-        console.log(UpdatedRoleData);
-        console.table(UpdatedRoleData[0])
+    
+    inquirer
+    .prompt(UpdateEmployeeRoleQuestions)
+    .then((response) => {
+        db.addRoles(response).then((results) => {
+            console.log ('\n', results, '\n');
+            MainMenuQuestions();
+        });
     })
     //Use the database to retrieve data
 }
