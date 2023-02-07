@@ -71,8 +71,8 @@ const UpdateEmployeeRoleQuestions = [
 ]
 
 //
-function addDepartments()
-{
+function addDepartments() {
+    db.promise().query("SELECT * from add_departments")
     inquirer
     .prompt(NewDepartment)
     .then ((response)=> {
@@ -94,7 +94,7 @@ function viewAllRoles(){
 }
 
 function viewAllEmployees(){
-    db.promise().query("SELECT * from employees ")
+    db.promise().query("SELECT * from employees")
     .then(function(employeeData){
         console.log(employeeData);
         console.table(employeeData[0])
@@ -105,34 +105,19 @@ function viewAllEmployees(){
 
 //add newdepartmenst questions and call back to main questions
 function viewAllDepartments() {
-        db.promise().query("SELECT * from add deperatments")
-    db.getDepartments().then((results) => {
-        const NewDepartment = AddRoleQuestions[2];
-        results.forEach((department) => {
-            NewDepartment.choices.push({
-                value:department.id,
-                name:department.name
-            });
-        })
-    });
-    }
-    
 
-function addRoles(){
-
-    inquirer
-    .prompt(UpdateEmployeeRoleQuestions)
-    .then((response) => {
-        db.addRoles(response).then((results) => {
-            console.log ('\n', results, '\n');
-            MainMenuQuestions();
-        });
-    })
-}
+db.promise().query("SELECT * from departments")
+.then(function(departmentData){
+    console.log(departmentData);
+    console.table(departmentData[0])
+})
+//Use the database to retrieve data
+};
 
 
 
 function addEmployees(){
+    db.promise().query("SELECT * from add_employee")
     inquirer
     .prompt(EmployeeQuestions)
     .then((response) => {
@@ -144,7 +129,7 @@ function addEmployees(){
 }
 
 function UpdateRole(){
-    
+    db.promise().query("SELECT * from update_role")
     inquirer
     .prompt(UpdateEmployeeRoleQuestions)
     .then((response) => {

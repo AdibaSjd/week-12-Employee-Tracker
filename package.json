@@ -18,8 +18,8 @@
   "homepage": "https://github.com/AdibaSjd/week-12-movie-Data-Base#readme",
   
   "dependencies": {
-   "inquirer": "^8.2.5"
+    "console.table": "0.10.0",
+   "inquirer": "^8.2.5",
+   "mysql2": "3.1.0"
     }
-  
-  
 }
