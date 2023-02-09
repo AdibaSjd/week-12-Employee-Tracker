@@ -1,184 +1,209 @@
-const inquirer = require ("inquirer")
-const db = require ("./db")
-require("console.table")
+const inquirer = require("inquirer")
+const db = require("./db")
+const { MainMenuQuestions, DepartmentQuestions, RoleQuestions, EmployeeQuestions, UpdateEmployeeRoleQuestions } = require("./questions");
 
-const MainMenuQuestions = [
-    {
-        type: "list",
-        name: "option",
-        message: "what would you like to do?",
-choices: [
-    {value: 'departments', name: "view differnt depeartments"},
-    {value: "roles", name: "view all roles"},
-    {value: "employees", name: "view all employees"},
-    {value: "add_departments", name:"add deperatments"},
-    {value: "add_role", name:"add role"},
-    {value: "add_employee", name:"add employee"},
-    {value: "update_role", name: "update employee role"}
-]
-    },
-]
+function viewAllRoles() {
+    db.promise().query("SELECT * from roles ")
+        .then(function (roleData) {
+            const results = roleData[0];
+            console.table(results)
+        }).then(() => {
+            MainMenu();
+        });
+}
 
-const NewDepartment = [
-    {
-        type: "input",
-        name: "name_department",
-        message: "Enter the name of your new department"
-    },
-     {
-        type: "number", 
-        name: "Salary", 
-        message: "Enter your new roles Salary (Numbers Only)",
-     },
-]
-
-const  EmployeeQuestions = [
-    {
-        type: "input",
-        name: "first_name",
-        message: "Enter employees first name..."
-    },
-    {
-        type: "input",
-        name: "last_name",
-        message: "Enter employees last name..."
-    },
-    {
-        type: "list",
-        name: "role_id",
-        message: "Select employee roles...",
-        choices:[
-        ]
-    },
-    {
-      type: "list",
-      name: "manager_id",
-      message: "Select the employee/'s manager...",
-      choices:[
-      ]
-    },
-]
+function viewAllEmployees() {
+    db.promise().query("SELECT * from employees")
+        .then(function (employeeData) {
+            const results = employeeData[0];
+            console.table(results);
+        }).then(() => {
+            MainMenu();
+        });
+}
 
 
-const UpdateEmployeeRoleQuestions = [
-    {
-        type: "list",
-        name: "employee_ID",
-        message: "select the employee/'s new Role ...",
-        choices: [
-        ],
-    },
-]
+//add newdepartment questions and call back to main questions
+function viewAllDepartments() {
 
-//
-function addDepartments() {
-    db.promise().query("SELECT * from add_departments")
+    db.promise().query("SELECT * from departments")
+        .then(function (departmentData) {
+
+            const results = departmentData[0];
+            console.table(results)
+        }).then(() => {
+            MainMenu();
+        });
+};
+
+function addRole() {
+
+    db.query("SELECT * from departments", (err, results) => {
+        if (err) {
+            console.warn(err);
+        } else {
+
+            const departments = results.map((department) => {
+                return {
+                    name: department.name,
+                    value: department.id
+                }
+            });
+
+            // add the departments to the new Role questions
+            RoleQuestions[2].choices = departments;
+        }
+
+        inquirer
+            .prompt(RoleQuestions)
+            .then((response) => {
+
+                // Build up the final data that we're going to insert into the database
+                const roleData = {
+                    title: response.title,
+                    salary: response.salary,
+                    department_id: response.department_id
+                };
+
+                db.query('INSERT INTO roles SET ?', roleData, (err, results) => {
+                    if (err) {
+                        console.warn(err);
+                    } else {
+                        console.log(`Role ${roleData.name} added!`);
+                        MainMenu();
+                    }
+                });
+            });
+    });
+};
+
+function addDepartment() {
+
     inquirer
-    .prompt(NewDepartment)
-    .then ((response)=> {
-        db.addDepartment(response).then((results) => {
-        console.log('\n', results, '\n');
-        })
+        .prompt(DepartmentQuestions)
+        .then((response) => {
+
+            const departmentData = {
+                name: response.name
+            };
+
+            db.query('INSERT INTO departments SET ?', departmentData, (err, results) => {
+                if (err) {
+                    console.warn(err);
+                } else {
+                    console.log(`Department ${departmentData.name} added!`);
+                    MainMenu();
+                }
+            });
+        });
+}
+
+
+// **********************************************************************
+// ** 
+// ** Adiba: Finish this this function
+// ** 
+// **********************************************************************
+function addEmployees() {
+
+    inquirer
+        .prompt(EmployeeQuestions)
+        .then((response) => {
+
+            const employeeData = {
+                name: response.name
+            };
+
+            db.query('INSERT INTO employee SET ?', employeeData, (err, results) => {
+                if (err) {
+                    console.warn(err);
+                } else {
+                    console.log(`Employee ${employeeData.name} added!`);
+                    MainMenu();
+                }
+            });
+        });
+}
+
+// **********************************************************************
+// ** 
+// ** Adiba: Finish this this function
+// ** 
+// **********************************************************************
+function UpdateRole() {
+    db.getEmployee().then((results) => {
+
+        const EmployeeQuestions = UpdateEmployeeRoleQuestions[0];
+        results.forEach((employee) => {
+        EmployeeQuestions.choices.push({
+            value: employee.id,
+            value: employee.title
+        });
+    });
+
+    db.getRoles().then((results) => {
+
+        const RoleQuestions = UpdateEmployeeRoleQuestions[1];
+        results.forEach((role) => {
+            RoleQuestions.choices.push({
+                value: role.id,
+                name: role.title
+            });
+        });
+
+        inquirer
+        .prompt (UpdateEmployeeRoleQuestions)
+        .then((response) => {
+            db.updateEmployeeRole(response).then((results) => {
+                console.log ('\n',results, '\n');
+                
+            });
+        });
+    });
 
     });
 }
 
 
-function viewAllRoles(){
-    db.promise().query("SELECT * from roles ")
-    .then(function(roleData){
-        console.log(roleData);
-        console.table(roleData[0])
-    })
-    //Use the database to retrieve data
-}
-
-function viewAllEmployees(){
-    db.promise().query("SELECT * from employees")
-    .then(function(employeeData){
-        console.log(employeeData);
-        console.table(employeeData[0])
-    })
-    //Use the database to retrieve data
-}
-
-
-//add newdepartmenst questions and call back to main questions
-function viewAllDepartments() {
-
-db.promise().query("SELECT * from departments")
-.then(function(departmentData){
-    console.log(departmentData);
-    console.table(departmentData[0])
-})
-//Use the database to retrieve data
-};
-
-
-
-function addEmployees(){
-    db.promise().query("SELECT * from add_employee")
-    inquirer
-    .prompt(EmployeeQuestions)
-    .then((response) => {
-        db.addEmployees(response).then((results) => {
-            console.log ('\n', results, '\n');
-            MainMenuQuestions();
-        });
-    })
-}
-
-function UpdateRole(){
-    db.promise().query("SELECT * from update_role")
-    inquirer
-    .prompt(UpdateEmployeeRoleQuestions)
-    .then((response) => {
-        db.addRoles(response).then((results) => {
-            console.log ('\n', results, '\n');
-            MainMenuQuestions();
-        });
-    })
-    //Use the database to retrieve data
-}
-
-function init() { 
+function MainMenu() {
     inquirer.prompt(MainMenuQuestions).then(answer => {
         console.log(answer)
-        
-        switch(answer.option){
-                case "departments":
-                  viewAllDepartments()
-                  break;
 
-                case "roles":
-                   viewAllRoles()
-                   break;
-            
-                case "employees":
-                    viewAllEmployees()
-                    break;
+        switch (answer.option) {
+            case "departments":
+                viewAllDepartments()
+                break;
 
-                case "add_departments":
-                    addDepartments()
-                    break;
+            case "roles":
+                viewAllRoles()
+                break;
 
-                case "add_role":
-                    addRoles()
-                    break;
+            case "employees":
+                viewAllEmployees()
+                break;
 
-                case "add_employee":
-                     addEmployees()
-                     break;
-                
-                case "update_role":
-                     UpdateRole()
-                     break;
-                
-            
+            case "add_departments":
+                addDepartment()
+                break;
+
+            case "add_role":
+                addRole()
+                break;
+
+            case "add_employee":
+                addEmployees()
+                break;
+
+            case "update_role":
+                UpdateRole()
+                break;
         }
     })
-  
 }
+
+function init() {
+    MainMenu();
+}
+
 // Function call to initialize app
 init();
-
