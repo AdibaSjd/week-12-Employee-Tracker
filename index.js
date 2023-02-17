@@ -38,31 +38,33 @@ function viewAllDepartments() {
 
 function addRole() {
 
-    db.query("SELECT * from departments", (err, results) => {
+    db.query(`SELECT * roles.title, roles.salary, departments.name as department from roles INNER JOIN departments ON roles.department_id = departments.id`, 
+    (err, results) => {
         if (err) {
             console.warn(err);
         } else {
 
-            const departments = results.map((department) => {
+            const roles = results.map((role) => {
                 return {
-                    name: department.name,
-                    value: department.id
+                    name: role.name,
+                    value: role.id
                 }
             });
 
             // add the departments to the new Role questions
-            RoleQuestions[2].choices = departments;
+            EmployeeQuestions[2].choices = departments;
         }
 
+ // RoleQuestions
         inquirer
             .prompt(RoleQuestions)
             .then((response) => {
 
                 // Build up the final data that we're going to insert into the database
                 const roleData = {
-                    title: response.title,
-                    salary: response.salary,
-                    department_id: response.department_id
+                    first_name: response.first_name,
+                    last_name: response.last_name,
+                    role_id: response.role_id
                 };
 
                 db.query('INSERT INTO roles SET ?', roleData, (err, results) => {
@@ -123,6 +125,7 @@ function addEmployees() {
                 }
             });
         });
+
 }
 
 // **********************************************************************
