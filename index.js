@@ -3,7 +3,7 @@ const db = require("./db")
 const { MainMenuQuestions, DepartmentQuestions, RoleQuestions, EmployeeQuestions, UpdateEmployeeRoleQuestions } = require("./questions");
 
 function viewAllRoles() {
-    db.promise().query("SELECT * from roles ")
+    db.promise().query("SELECT roles.id, roles.title, roles.salary AS salary, departments.name AS departments_name from roles INNER JOIN departments ON roles.department_id = departments.id;")
         .then(function (roleData) {
             const results = roleData[0];
             console.table(results)
@@ -38,21 +38,21 @@ function viewAllDepartments() {
 
 function addRole() {
 
-    db.query(`SELECT * roles.title, roles.salary, departments.name as department from roles INNER JOIN departments ON roles.department_id = departments.id`, 
+    db.query(`SELECT * from departments`, 
     (err, results) => {
         if (err) {
             console.warn(err);
         } else {
 
-            const roles = results.map((role) => {
+            const departments = results.map((departments) => {
                 return {
-                    name: role.name,
-                    value: role.id
+                    name: departments.name,
+                    value: departments.id
                 }
             });
 
             // add the departments to the new Role questions
-            EmployeeQuestions[2].choices = departments;
+            RoleQuestions[2].choices = departments;
         }
 
  // RoleQuestions
@@ -62,16 +62,16 @@ function addRole() {
 
                 // Build up the final data that we're going to insert into the database
                 const roleData = {
-                    first_name: response.first_name,
-                    last_name: response.last_name,
-                    role_id: response.role_id
+                    title: response.title,
+                    salary: response.salary,
+                    department_id: response.department_id
                 };
 
                 db.query('INSERT INTO roles SET ?', roleData, (err, results) => {
                     if (err) {
                         console.warn(err);
                     } else {
-                        console.log(`Role ${roleData.name} added!`);
+                        console.log(`Role ${response.title} added!`);
                         MainMenu();
                     }
                 });
