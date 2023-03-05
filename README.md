@@ -28,14 +28,14 @@ information is updated in the database
 
 
 ## General info
-This is a page developed through Java Script, Node.js, Inquirer, and MySQL. Allowing the user to manipulate the database and add departments, roles, and employees in a company. The user is presented with the terminal and once ran using the command-line a user is able to view all details on the companys database; add and make changes to it.
+This is developedthrough Java Script, Node.js, Inquirer, and MySQL. Allowing the user to manipulate the database and add departments, roles, and employees in a company. The user is presented with the terminal and once ran using the command-line a user is able to view all details on the companys database; add and make changes to it.
 
 
-## Page link
+## Video link
 Video link: https://drive.google.com/file/d/1jqKUb3zdVjytD0QFHuX9_48xZTAi-Dl4/view
 
 
-## MY WEB PAGE
+## Command Line
 - User is presented with the terminal and prompted through the command-line. 
 - Tables showing departments, roles, and employees in a company are present.
 ![](./images/employee.png)
