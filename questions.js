@@ -73,7 +73,14 @@ const EmployeeQuestions = [
 const UpdateEmployeeRoleQuestions = [
     {
         type: "list",
-        name: "employee_ID",
+        name: "employee_id",
+        message: "select the employee/'s new Role ...",
+        choices: [
+        ],
+    },
+    {
+        type: "list",
+        name: "role_id",
         message: "select the employee/'s new Role ...",
         choices: [
         ],
