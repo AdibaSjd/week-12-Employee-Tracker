@@ -205,7 +205,8 @@ function addEmployee() {
                             const employeData = {
                                 first_name: response.first_name,
                                 last_name: response.last_name,
-                                role_id: response.role_id
+                                role_id: response.role_id,
+                                manager_id: response.manager_id
                             };
 
                             db.query('INSERT INTO employees SET ?', employeData, (err, results) => {
